@@ -1,4 +1,4 @@
-COMPILER=python
+COMPILER=python3
 FLAGS=source/setup.py build_ext --inplace
 main:
 	$(COMPILER) $(FLAGS)

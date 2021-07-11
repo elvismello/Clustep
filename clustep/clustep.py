@@ -3,7 +3,7 @@ from sys import path as syspath
 from bisect import bisect_left
 from os import path
 from argparse import ArgumentParser as parser
-from ConfigParser import ConfigParser
+import configparser
 import time
 
 import numpy as np
@@ -13,12 +13,7 @@ from scipy.optimize import brentq
 
 from snapwrite import write_snapshot
 import optimized_functions as opt
-syspath.append(path.join(path.dirname(__file__), '..', 'misc'))
-from units import temp_to_internal_energy
-
-
-G = 44920.0
-
+import units
 
 def main():
   init()
@@ -29,31 +24,31 @@ def main():
 def generate_cluster():
   if(gas):
     if(dm):
-      print "defining the positions"
+      print( "defining the positions")
       coords, radii_gas, radii_dm = set_positions()
-      print "defining the velocities"
+      print( "defining the velocities")
       vels = set_velocities(radii_dm)
-      print "calculating the temperatures"
+      print( "calculating the temperatures")
       U = set_temperatures(radii_gas)
       rho = np.array([opt.dehnen_density(i, M_gas, a_gas, gamma_gas)
                       for i in radii_gas])
-      print "writing output file..."
+      print( "writing output file...")
       return [coords, vels, U, rho]
     else:
-      print "defining the positions"
+      print( "defining the positions")
       coords, radii_gas = set_positions()
       vels = set_velocities()
-      print "calculating the temperatures"
+      print( "calculating the temperatures")
       U = set_temperatures(radii_gas)
       rho = np.zeros(N_gas)
-      print "writing output file..."
+      print( "writing output file...")
       return [coords, vels, U, rho]
   else:
-    print "defining the positions"
+    print( "defining the positions")
     coords, radii_dm = set_positions()
-    print "defining the velocities"
+    print( "defining the velocities")
     vels = set_velocities(radii_dm)
-    print "writing output file..."
+    print( "writing output file...")
     return [coords, vels]
 
 
@@ -75,11 +70,11 @@ def init():
   args = flags.parse_args()
   output = args.o
   if not path.isfile("params_cluster.ini"):
-    print "params_cluster.ini missing."
+    print( "params_cluster.ini missing.")
     exit(0)
   if args.no_dm:
     if args.no_gas:
-      print "Neither gas or dark matter were selected!"
+      print( "Neither gas or dark matter were selected!")
       exit(0)
     else:
       gas = True
@@ -90,7 +85,7 @@ def init():
   else:
     gas = True
     dm = True
-  config = ConfigParser()
+  config = configparser.ConfigParser(inline_comment_prefixes=';')
   config.read("params_cluster.ini")
   M_dm = config.getfloat('dark_matter', 'M_dm')
   a_dm = config.getfloat('dark_matter', 'a_dm')
@@ -121,13 +116,13 @@ def potential(r):
   phi = 0
   if(gas):
     if gamma_gas != 2:
-      phi += (G*M_gas)/a_gas * (-1.0/(2-gamma_gas)) * (1-(r/(r+float(a_gas)))**(2-gamma_gas))
+      phi += (units.G*M_gas)/a_gas * (-1.0/(2-gamma_gas)) * (1-(r/(r+float(a_gas)))**(2-gamma_gas))
     else:
-      phi += (G*M_gas)/a_gas * np.log(r/(r+float(a_gas)))
+      phi += (units.G*M_gas)/a_gas * np.log(r/(r+float(a_gas)))
   if gamma_dm != 2:
-    phi += (G*M_dm)/a_dm * (-1.0/(2-gamma_dm)) * (1-(r/(r+float(a_dm)))**(2-gamma_dm))
+    phi += (units.G*M_dm)/a_dm * (-1.0/(2-gamma_dm)) * (1-(r/(r+float(a_dm)))**(2-gamma_dm))
   else:
-    phi += (G*M_dm)/a_dm * np.log(r/(r+float(a_dm)))
+    phi += (units.G*M_dm)/a_dm * np.log(r/(r+float(a_dm)))
   return phi
 
 
@@ -181,13 +176,13 @@ def set_velocities(radii_dm=None):
     for i in np.linspace(potential(0)*0.99, 0, 1000):
       DF_tabulated.append([i, DF(i)])
     DF_tabulated = np.array(DF_tabulated)
-    print "done with DF tabulation"
+    print( "done with DF tabulation")
     t0 = time.time()
     time_count = 0
     for i in np.arange(len(radii_dm)):
       vels.append(sample_velocity(radii_dm[i], DF_tabulated))
       if(int(time.time()-t0) > time_count):
-        print 'set velocity', i, 'of', N_dm
+        print( 'set velocity', i, 'of', N_dm)
         time_count += 1
   vels = np.array(vels, order='C')
   vel_COM = sum(vels) # The velocity of the center of mass.
@@ -278,9 +273,9 @@ def temperature(r):
   temp_n = MP_OVER_KB * meanweight_n * result
 
   if(temp_i > 1.0e4):
-    return temp_to_internal_energy(temp_i)
+    return units.temp_to_internal_energy(temp_i)
   else:
-    return temp_to_internal_energy(temp_n)
+    return units.temp_to_internal_energy(temp_n)
 
 
 def set_temperatures(radii_gas):
