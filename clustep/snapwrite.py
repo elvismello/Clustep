@@ -2,7 +2,6 @@ import sys
 import os
 import struct
 import numpy as np
-import snapwrite
 
 def read_header(n_part):
     h_data = []
