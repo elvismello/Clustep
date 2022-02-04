@@ -29,7 +29,7 @@ box in RAMSES with the [DICE patch](https://bitbucket.org/vperret/dice/wiki/RAMS
 * SciPy (python-scipy)
 * Cython (cython), higher than 0.17.4
 * Matplotlib (python-matplotlib)
-* Argparse (python-argparse), in case you use Python < 3.2
+* Argparse (python-argparse)
 * python-dev
 
 
