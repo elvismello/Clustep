@@ -75,5 +75,5 @@ for the vital support and suggestions in writing this code.
 
 ## Disclaimer
 
-Feel free to use this code in your work, but please link [Ruggiero's page](https://github.com/ruggiero/clustep)
-in your paper.
+Feel free to use this code in your work, but please link this page and
+[Ruggiero's original code](https://github.com/ruggiero/clustep) in your paper.
