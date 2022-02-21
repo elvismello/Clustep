@@ -56,6 +56,8 @@ def init():
   global gas, dm, output
   global M_dm, a_dm, N_dm, M_gas, a_gas, N_gas, Z
   global truncation_radius, gamma_gas, gamma_dm
+  global file_format
+
   flags = parser(description="Generates an initial conditions file\
                 for a galaxy cluster halo simulation.")
   flags.add_argument('--no-dm', help='No dark matter particles in the\
@@ -67,8 +69,18 @@ def init():
            action='store_true')
   flags.add_argument('-o', help='The name of the output file.',
            metavar="init.dat", default="init.dat")
+  flags.add_argument('--hdf5', help='Writes output in HDF5 format. If\
+           this flag is not parsed, the programs defaults to Gadget2\
+           bynary format', action='store_true')
   args = flags.parse_args()
+  
+  if args.hdf5:
+    file_format = 'hdf5'
+  else:
+    file_format = 'gadget2'
+
   output = args.o
+
   if not path.isfile("params_cluster.ini"):
     print( "params_cluster.ini missing.")
     exit(0)
@@ -308,19 +320,22 @@ def write_input_file(cluster_data):
       masses = np.concatenate((masses_gas, masses_dm))
       ids = np.arange(1, N_gas + N_dm + 1)
       write_snapshot(n_part=[N_gas, N_dm, 0, 0, 0, 0], outfile=output,
-             data_list=[coords, vels, ids, masses, U, rho, smooths, Zs])
+             data_list=[coords, vels, ids, masses, U, rho, smooths, Zs],
+             file_format=file_format)
     else:
       masses = masses_gas
       ids = np.arange(1, N_gas + 1)
       write_snapshot(n_part=[N_gas, 0, 0, 0, 0, 0], outfile=output,
-             data_list=[coords, vels, ids, masses, U, rho, smooths, Zs])
+             data_list=[coords, vels, ids, masses, U, rho, smooths, Zs],
+             file_format=file_format)
   else:
     ids = np.arange(1, N_dm + 1)
     masses_dm = np.empty(N_dm)
     masses_dm.fill(M_dm / N_dm)
     masses = masses_dm
     write_snapshot(n_part=[0, N_dm, 0, 0, 0, 0], outfile=output, 
-            data_list=[coords, vels, ids, masses])
+            data_list=[coords, vels, ids, masses],
+            file_format=file_format)
 
 
 if __name__ == '__main__':

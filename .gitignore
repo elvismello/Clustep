@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# hidden file
+.fuse*
+
+# C program made by Cython
+optimized_functions.c
