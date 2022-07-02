@@ -214,7 +214,7 @@ def DF(E):
     return 0
   else:
     # This is r(epsilon), where psi(r) - epsilon = 0.
-    limit = brentq(lambda r : -potential(r) - epsilon, 0, 1.0e10)
+    limit = brentq(lambda r : -potential(r) - epsilon, 0, 1.0e10, maxiter=1000)
     if(gas):
       if(gamma_gas == 0):
         if(gamma_dm == 0):
