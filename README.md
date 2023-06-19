@@ -53,12 +53,14 @@ Generates an initial conditions file for a galaxy cluster halo simulation.
 
 optional arguments:
   -h, --help            show this help message and exit
-  --no-dm               No dark matter particles in the initial conditions. The dark matter potential is still used when calculating the gas temperatures.
+  --no-dm               No dark matter particles in the initial conditions. The dark matter
+                        potential is still used when calculating the gas temperatures.
   --no-gas              Gas is completely ignored, and only dark matter is included.
   -i params_cluster.ini
                         The name of the input file.
   -o init.dat           The name of the output file.
-  --hdf5                Writes output in HDF5 format. If this flag is not parsed, the programs defaults to Gadget2 bynary format
+  --hdf5                Writes output in HDF5 format. If this flag is not parsed, the programs
+                        defaults to Gadget2 bynary format
 ```
 
 
