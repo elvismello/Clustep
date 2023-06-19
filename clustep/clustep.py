@@ -53,7 +53,7 @@ def generate_cluster():
 
 
 def init():
-  global gas, dm, output
+  global gas, dm, output, input_name
   global M_dm, a_dm, N_dm, M_gas, a_gas, N_gas, Z
   global truncation_radius, gamma_gas, gamma_dm
   global file_format
@@ -67,6 +67,8 @@ def init():
   flags.add_argument('--no-gas', help='Gas is completely ignored, and\
            only dark matter is included.',
            action='store_true')
+  flags.add_argument('-i', help='The name of the input file.',
+           metavar="params_cluster.ini", default="params_cluster.ini")
   flags.add_argument('-o', help='The name of the output file.',
            metavar="init.dat", default="init.dat")
   flags.add_argument('--hdf5', help='Writes output in HDF5 format. If\
@@ -80,9 +82,10 @@ def init():
     file_format = 'gadget2'
 
   output = args.o
+  input_name = args.i
 
-  if not path.isfile("params_cluster.ini"):
-    print( "params_cluster.ini missing.")
+  if not path.isfile(input_name):
+    print( f"Input file \"{input_name}\" is missing or there is a typo.")
     exit(0)
   if args.no_dm:
     if args.no_gas:
@@ -98,7 +101,7 @@ def init():
     gas = True
     dm = True
   config = configparser.ConfigParser(inline_comment_prefixes=';')
-  config.read("params_cluster.ini")
+  config.read(input_name)
   M_dm = config.getfloat('dark_matter', 'M_dm')
   a_dm = config.getfloat('dark_matter', 'a_dm')
   N_dm = config.getint('dark_matter', 'N_dm')
@@ -214,7 +217,7 @@ def DF(E):
     return 0
   else:
     # This is r(epsilon), where psi(r) - epsilon = 0.
-    limit = brentq(lambda r : -potential(r) - epsilon, 0, 1.0e10, maxiter=1000)
+    limit = brentq(lambda r : -potential(r) - epsilon, 0, 1.0e6)
     if(gas):
       if(gamma_gas == 0):
         if(gamma_dm == 0):
